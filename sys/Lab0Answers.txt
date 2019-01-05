@@ -1,0 +1,77 @@
+1.
+	Assuming the memory address starts from 0x0, below is the diagram which gives the insight of XINU's memory layout based on the output and information gathered from printsegaddress() and printprocstks():
+
+   |------------|stack base: 0x00ffeff8	   ---- 
+   |		|			      |
+   |		|	 		      |
+   |		|                             |
+   |	stack	|			      |- length: 4096 bytes
+   |		|			      |
+   |		|<--stack pointer: 0x00ffefa0 |
+   |		|			      |
+   |------------|stack limit: 0x00ffdffc   ----
+   |		|
+   |		|
+   |	heap	|
+   |		|
+   |		|
+   |------------|ebss:0x00023478
+   |		|
+   |		|
+   |	bss	|
+   |		|
+   |		|
+   |------------|edata:0x0001d660
+   |		|
+   |		|
+   |	data	|
+   |		|
+   |		|
+   |------------|etext:0x00019017
+   |		|
+   |		|
+   |	text	|
+   |		|
+   |		|
+   |------------|begin:0x0
+
+The above is an illustration of memory layout of XINU when a "main" process is running. The stack pointer is variable to the process under consideration.
+
+
+
+
+2.
+	As per the output of task 3:
+ Top of stack before calling printtos():0x00ffeff4
+ Top of stack after calling printtos():0x00ffefec
+
+Difference is (0x00ffeff4-0x00ffefec)=0x8(8 bytes)
+
+After calling the function the ebp information of the caller function(4 bytes) plus the return address of the caller function(4 bytes) is stored on the top of stack respectively.
+
+	|		|<--currenttop of stack(esp) 
+	|		|
+	|local variables|<---- variables of callee pushed after the call
+	|		|
+	|---------------|<--just after calling function(printtos())-0x00ffefec
+	|		|
+	|	ebp	|
+	|---------------|
+	|		|
+	|return address	|<--return address of the caller(main)
+	|---------------|<--just before calling function(printtos())-0x00ffeff4
+	|		|
+	| last saved    |
+	| contents of   |
+	| main		|    
+	|		|    
+	|		|    
+
+
+
+3.
+	No output of task 3 doesn't show the variables that I have created.
+
+	One of the task of compiler optimization is to reduce the memory usage. In the context of the given problem, our compiler optimizes the memory usage by not saving the unused variables on to the stack by default. It is only saved if they are made use of. 
+ 
+	Or if the optimization is disabled then the variables are pushed on to the stack irrsepective of whether they are used or not. While executing files an addition of -O0 disables the optimization.
